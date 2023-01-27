@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "664667660844",
+    "firebase_url": "https://proyecto-cobros.firebaseio.com",
+    "project_id": "proyecto-cobros",
+    "storage_bucket": "proyecto-cobros.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664667660844:android:6768afb7ada1b38fcc2789",
+        "android_client_info": {
+          "package_name": "com.app.vefi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "664667660844-58tej3ks5jqujictj1v4lhnltjdp8sv4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.vefi",
+            "certificate_hash": "d1f1f8ac81fce8bfdd23d63cf1012e5cc10fdde6"
+          }
+        },
+        {
+          "client_id": "664667660844-hhkdiolpct2e6ksrjis9tfal8rucp41k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.vefi",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "664667660844-su110fl94ppt6nhaekoi35vnl92ici04.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSJAHGx9A-C0cIHudvGMN12oe6Hj1skrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664667660844-su110fl94ppt6nhaekoi35vnl92ici04.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "664667660844-dhdolgm4i9i9n28f8p2iu0788mlnq5cv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dgarces.librodecobrosapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664667660844:android:b3adfbfc3c285878cc2789",
+        "android_client_info": {
+          "package_name": "com.dgarces.librodecobrosapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "664667660844-am1qj5m7u31ishmpbgc4lp9sk755hfmd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dgarces.librodecobrosapp",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "664667660844-su110fl94ppt6nhaekoi35vnl92ici04.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSJAHGx9A-C0cIHudvGMN12oe6Hj1skrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664667660844-su110fl94ppt6nhaekoi35vnl92ici04.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "664667660844-dhdolgm4i9i9n28f8p2iu0788mlnq5cv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dgarces.librodecobrosapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
