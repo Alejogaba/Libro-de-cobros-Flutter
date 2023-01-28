@@ -92,10 +92,10 @@ class StorageController {
       Logger().v('filename: $fileName');
       Logger().v('Storagereference');
 // Create a reference to "mountains.jpg"
-      final mountainsRef = storageRef.child("$fileName");
+      final mountainsRef = storageRef.child(bucketName).child("$fileName");
 
 // Create a reference to 'images/mountains.jpg'
-      final mountainImagesRef = storageRef.child("images/$fileName");
+      final mountainImagesRef = storageRef.child(bucketName).child("images/$fileName");
       Logger().v('mountainsref');
 // While the file names are the same, the references point to different files
       assert(mountainsRef.name == mountainImagesRef.name);

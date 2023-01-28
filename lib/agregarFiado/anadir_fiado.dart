@@ -134,12 +134,10 @@ class _AgregarFiadoState extends State<AgregarFiado> {
                         await productController.registrarProductoaDeudor(
                             product, idDeudor.toString());
                       }
-
+                       Navigator.pop(context);
                       try {
-                        Navigator.of(context).pop();
-                        setState(() {
-                          okBtnHabilitado = true;
-                        });
+                        
+                       
                       } catch (e) {}
                     }
                   } catch (e) {
@@ -149,10 +147,10 @@ class _AgregarFiadoState extends State<AgregarFiado> {
                     logger.Logger().e(e);
                   }
                 },
-                child: Icon(Icons.check,
+                child: (okBtnHabilitado) ? Icon(Icons.check,
                     color: okBtnHabilitado
                         ? FlutterFlowTheme.of(context).primaryBtnText
-                        : FlutterFlowTheme.of(context).gray200),
+                        : FlutterFlowTheme.of(context).gray200): CircularProgressIndicator(color: FlutterFlowTheme.of(context).primaryBtnText,),
                 backgroundColor: Colors.green,
               )
           ],

@@ -21,7 +21,7 @@ class ProductController {
 
     var documents = querySnapshot.docs;
     List<Product> products = [];
-    if (pattern.length < 3) {
+    if (pattern.length < 1) {
       documents.forEach(
         (element) {
           Product producto = Product.fromMap(element);
@@ -45,7 +45,7 @@ class ProductController {
       );
     }
 
-    if (products.length < 3) {
+    if (products.length < 1) {
       Product producto = Product(
           registrationDate: DateTime.now(),
           name: 'Registrar "$pattern"',
@@ -73,7 +73,7 @@ class ProductController {
 
     var documents = querySnapshot.docs;
     List<Product> products = [];
-    if (pattern.length < 3) {
+    if (pattern.length < 1) {
       documents.forEach(
         (element) {
           Product producto = Product.fromMap(element);
@@ -129,7 +129,7 @@ class ProductController {
 
     var documents = querySnapshot.docs;
     List<Product> products = [];
-    if (pattern.length < 3) {
+    if (pattern.length < 1) {
       documents.forEach(
         (element) {
           Product producto = Product.fromMap(element);
