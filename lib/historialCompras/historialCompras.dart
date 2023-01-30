@@ -11,6 +11,7 @@ import 'package:libro_de_cobros_app/models/product.dart';
 import 'package:optimized_cached_image/optimized_cached_image.dart';
 import 'package:swipe_to/swipe_to.dart';
 
+import '../backend/services/pdfApi.dart';
 import '../flutter_flow/flutter_flow_animations.dart';
 import '../flutter_flow/flutter_flow_icon_button.dart';
 import '../flutter_flow/flutter_flow_theme.dart';
@@ -18,11 +19,13 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:printing/printing.dart';
 
 import '../flutter_flow/flutter_flow_util.dart';
 import '../flutter_flow/flutter_flow_widgets.dart';
 import 'package:logger/logger.dart' as logger;
 import 'package:flutter_swipe_action_cell/flutter_swipe_action_cell.dart';
+import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 class HistorialCompras extends StatefulWidget {
   final String? idDeudor;
@@ -132,14 +135,17 @@ class _HistorialComprasState extends State<HistorialCompras>
   _HistorialComprasState(this.idDeudor, this.nombreDeudor);
   List<Product> listaProductosSumaGeneral = [];
   List<Product> listaProductosSuma = [];
+  Map<DateTime, List<Product>>? listaProductosDeudor;
   ScrollController scrollController = ScrollController();
   bool fbEsVisible = true;
   bool blur = false;
+  late ValueNotifier<double> valueNotifier;
   String? idProductoEliminar;
   late var _getData;
   @override
   void initState() {
     super.initState();
+    valueNotifier = ValueNotifier(0.0);
     _getData = ProductController().getSumaProductosDeudor(idDeudor!);
     setupAnimations(
       animationsMap.values.where((anim) =>
@@ -169,11 +175,10 @@ class _HistorialComprasState extends State<HistorialCompras>
                 pageBuilder: (BuildContext context, Animation<double> animation,
                     Animation<double> secondaryAnimation) {
                   return SlideTransition(
-                  
                     position: Tween<Offset>(
-          begin: Offset(0.0, 1.0),
-          end: Offset.zero,
-        ).animate(animation),
+                      begin: Offset(0.0, 1.0),
+                      end: Offset.zero,
+                    ).animate(animation),
                     child: AgregarFiado(
                       idDeudor: idDeudor,
                       nombreDeudor: nombreDeudor,
@@ -195,6 +200,49 @@ class _HistorialComprasState extends State<HistorialCompras>
       key: scaffoldKey,
       backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
       appBar: AppBar(
+        actions: [
+          FlutterFlowIconButton(
+            borderColor: Colors.transparent,
+            borderRadius: 30,
+            borderWidth: 1,
+            buttonSize: 60,
+            icon: FaIcon(
+              FontAwesomeIcons.filePdf,
+              color: FlutterFlowTheme.of(context).primaryText,
+              size: 30,
+            ),
+            onPressed: () async {
+              if (listaProductosDeudor != null) {
+                setState(() {
+                  blur = true;
+                });
+                double current = 0;
+                List<Product> listaProductosPdf = [];
+                double total = double.parse(listaProductosDeudor!.values.expand((e) => e).length.toString());
+                logger.Logger().v('total elementos: $total');
+                await Future.forEach(
+                    listaProductosDeudor!.values.expand((e) => e),
+                    (Product element) async {
+                  element.netImage = await networkImage(element.imagenUrl);
+                  listaProductosPdf.add(element);
+                  current++;
+                  logger.Logger()
+                      .v('Añadido elemento #: $current - ${element.imagenUrl}');
+                  valueNotifier.value = (current / total) * 100;
+                  logger.Logger()
+                      .v('Porcentaje: ${(current / total) * 100}');
+                }).then((value) async => {
+                      logger.Logger().v('Generando pdf...'),
+                      await PdfApi().generarHojaSalida(
+                          listaProductosDeudor!, listaProductosPdf, nombreDeudor!)
+                    });
+                setState(() {
+                  blur = false;
+                });
+              }
+            },
+          ),
+        ],
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         automaticallyImplyLeading: false,
         leading: FlutterFlowIconButton(
@@ -215,7 +263,6 @@ class _HistorialComprasState extends State<HistorialCompras>
           nombreDeudor.toString(),
           style: FlutterFlowTheme.of(context).subtitle1,
         ),
-        actions: [],
         centerTitle: false,
         elevation: 0,
       ),
@@ -240,6 +287,7 @@ class _HistorialComprasState extends State<HistorialCompras>
                         if (snapshotGroup.connectionState ==
                                 ConnectionState.done &&
                             snapshotGroup.hasData) {
+                          listaProductosDeudor = snapshotGroup.data!;
                           listaProductosSumaGeneral = [];
                           return ListView.builder(
                             padding: EdgeInsets.zero,
@@ -284,27 +332,34 @@ class _HistorialComprasState extends State<HistorialCompras>
                                         itemBuilder:
                                             (BuildContext context, int index) {
                                           return Padding(
-                                            padding: EdgeInsetsDirectional
-                                                  .fromSTEB(16, 0, 16, 8),
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    16, 0, 16, 8),
                                             child: SwipeActionCell(
-                                              backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-                                              key: ObjectKey(productList[index]),
+                                              backgroundColor:
+                                                  FlutterFlowTheme.of(context)
+                                                      .primaryBackground,
+                                              key:
+                                                  ObjectKey(productList[index]),
                                               trailingActions: <SwipeAction>[
                                                 SwipeAction(
                                                     icon: Icon(
                                                       Icons.delete_outline,
-                                                      color: FlutterFlowTheme.of(
-                                                              context)
-                                                          .primaryBtnText,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryBtnText,
                                                     ),
                                                     title: "Eliminar",
                                                     onTap: (CompletionHandler
                                                         handler) async {
-                                                      if (productList[index].id !=
+                                                      if (productList[index]
+                                                              .id !=
                                                           null) {
                                                         await ProductController()
                                                             .eliminarProductodeFuncionario(
-                                                                productList[index]
+                                                                productList[
+                                                                        index]
                                                                     .id,
                                                                 idDeudor!);
                                                       }
@@ -329,21 +384,26 @@ class _HistorialComprasState extends State<HistorialCompras>
                                                     boxShadow: [
                                                       BoxShadow(
                                                         blurRadius: 4,
-                                                        color: Color(0x520E151B),
+                                                        color:
+                                                            Color(0x520E151B),
                                                         offset: Offset(0, 2),
                                                       )
                                                     ],
                                                     borderRadius:
-                                                        BorderRadius.circular(8),
+                                                        BorderRadius.circular(
+                                                            8),
                                                   ),
                                                   child: Padding(
-                                                    padding: EdgeInsetsDirectional
-                                                        .fromSTEB(8, 8, 8, 8),
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                                8, 8, 8, 8),
                                                     child: Row(
                                                       mainAxisSize:
                                                           MainAxisSize.max,
                                                       mainAxisAlignment:
-                                                          MainAxisAlignment.start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                       children: [
                                                         ClipRRect(
                                                           borderRadius:
@@ -351,11 +411,13 @@ class _HistorialComprasState extends State<HistorialCompras>
                                                                   .circular(6),
                                                           child:
                                                               CachedNetworkImage(
-                                                            fit: BoxFit.fitWidth,
+                                                            fit:
+                                                                BoxFit.fitWidth,
                                                             height: 70,
                                                             width: 70,
                                                             imageUrl:
-                                                                productList[index]
+                                                                productList[
+                                                                        index]
                                                                     .imagenUrl
                                                                     .toString(),
                                                             progressIndicatorBuilder: (context,
@@ -364,17 +426,22 @@ class _HistorialComprasState extends State<HistorialCompras>
                                                                 CircularProgressIndicator(
                                                                     value: downloadProgress
                                                                         .progress),
-                                                            errorWidget: (context,
-                                                                    url, error) =>
-                                                                Icon(Icons.error),
+                                                            errorWidget:
+                                                                (context, url,
+                                                                        error) =>
+                                                                    Icon(Icons
+                                                                        .error),
                                                           ),
                                                         ),
                                                         Expanded(
                                                           child: Padding(
                                                             padding:
                                                                 EdgeInsetsDirectional
-                                                                    .fromSTEB(12,
-                                                                        0, 0, 0),
+                                                                    .fromSTEB(
+                                                                        12,
+                                                                        0,
+                                                                        0,
+                                                                        0),
                                                             child: Column(
                                                               mainAxisSize:
                                                                   MainAxisSize
@@ -400,28 +467,19 @@ class _HistorialComprasState extends State<HistorialCompras>
                                                                       .subtitle1,
                                                                 ),
                                                                 Padding(
-                                                                  padding:
-                                                                      EdgeInsetsDirectional
-                                                                          .fromSTEB(
-                                                                              0,
-                                                                              5,
-                                                                              0,
-                                                                              0),
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0,
+                                                                          5,
+                                                                          0,
+                                                                          0),
                                                                   child: Text(
                                                                     (DateTime.now().day == productList[index].registrationDate.day &&
                                                                             DateTime.now().month ==
-                                                                                productList[index]
-                                                                                    .registrationDate
-                                                                                    .month &&
-                                                                            DateTime.now().year ==
-                                                                                productList[index]
-                                                                                    .registrationDate
-                                                                                    .year)
+                                                                                productList[index].registrationDate.month &&
+                                                                            DateTime.now().year == productList[index].registrationDate.year)
                                                                         ? 'Hoy ${dateFormatterTime.format(productList[index].registrationDate).toString()}'
-                                                                        : dateFormatter
-                                                                            .format(
-                                                                                productList[index].registrationDate)
-                                                                            .toString(),
+                                                                        : dateFormatter.format(productList[index].registrationDate).toString(),
                                                                     style: FlutterFlowTheme.of(
                                                                             context)
                                                                         .bodyText2,
@@ -435,28 +493,27 @@ class _HistorialComprasState extends State<HistorialCompras>
                                                                     .price >=
                                                                 0)
                                                             ? Text(
-                                                                formatoColombiano
-                                                                    .format(productList[
+                                                                formatoColombiano.format(
+                                                                    productList[
                                                                             index]
                                                                         .price),
-                                                                style: FlutterFlowTheme
-                                                                        .of(context)
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
                                                                     .bodyText2,
                                                               )
                                                             : Text(
                                                                 '+${formatoColombiano.format(productList[index].price).replaceAll('-', '')}',
-                                                                style: FlutterFlowTheme
-                                                                        .of(context)
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
                                                                     .bodyText2
                                                                     .override(
                                                                       fontFamily:
                                                                           'Poppins',
-                                                                      color: Color
-                                                                          .fromARGB(
-                                                                              255,
-                                                                              22,
-                                                                              141,
-                                                                              83),
+                                                                      color: Color.fromARGB(
+                                                                          255,
+                                                                          22,
+                                                                          141,
+                                                                          83),
                                                                     )),
                                                       ],
                                                     ),
@@ -592,10 +649,14 @@ class _HistorialComprasState extends State<HistorialCompras>
                     Align(
                       alignment: AlignmentDirectional(0, 0),
 
-                      child: _cajaAdvertencia(
-                          context,
-                          '¿Esta realmente seguro que desea eliminar este registro?',
-                          idProductoEliminar),
+                      child: SimpleCircularProgressBar(
+                        mergeMode: true,
+                        valueNotifier: valueNotifier,
+                        onGetText: (double value) {
+                          return Text('${value.toInt()}%');
+                        },
+                      ),
+
                       //. animateOnActionTrigger(animationsMap['cajaAdvertenciaOnActionTriggerAnimation']!,hasBeenTriggered: true),
                     ),
                   ],

@@ -17,7 +17,7 @@ class Product {
   bool mostrarContador = true;
   TextEditingController textController = TextEditingController();
   FocusNode textFieldFocus = FocusNode();
-
+  dynamic netImage;
   Product(
       {this.id='',
         this.name = '',
@@ -29,7 +29,8 @@ class Product {
       required this.registrationDate,
       this.cantidad = 1,
       this.total = 0,
-      this.mostrarContador = true});
+      this.mostrarContador = true,
+      this.netImage});
 
   calcularTotal() {
     this.total = this.price * double.parse(this.cantidad.toString());
